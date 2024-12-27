@@ -1,0 +1,5 @@
+./deposit_data.json
+node_modules
+.DS_Store
+
+.env
