@@ -14,6 +14,30 @@ NODE_OPERATOR_ID=2763
 
 ```
 
-3. pnpm install
+3. `pnpm install`
 
-4. node main.js
+4. `node main.js`
+
+# run node generateDepositData.js
+
+1. pnpm install
+
+2. set env, and rename `.env.example` to `.env`
+
+```
+GENERATE_PRIVATE_KEY=your_private_key_here
+
+CLUSTER_NODE_URL=http://127.0.0.1:7777
+```
+
+3. node `generateDepositData.js`
+
+4. and you will get json file like `generateDepositData-1737859348838.json`
+
+# run node registerValidator.js
+
+1. pnpm install
+
+2. edit `registerValidator.js`, and rename your `generateDepositData-1737859348838.json` in `main` function
+
+3. make sure you have enough `DVT` and `ETH` in your wallet, and `node registerValidator.js`
