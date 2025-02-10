@@ -14,9 +14,9 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console(), new winston.transports.File({ filename: "registerValidator.log" })],
 });
 
-const clusterNodeABI = require("./clusterNodeABI.json");
-const erc20ABI = require("./erc20ABI.json");
-const networkABI = require("./networkABI.json");
+const clusterNodeABI = require("./abi/clusterNodeABI.json");
+const erc20ABI = require("./abi/erc20ABI.json");
+const networkABI = require("./abi/networkABI.json");
 
 const ethers = require("ethers");
 
@@ -82,21 +82,20 @@ async function registerValidator(
   await tx.wait(2); // Wait for 2 block confirmations
 }
 
-function sort_and_make_operator_detail( operators ) {
-  operators = operators.sort( ( o1, o2 ) => {
-    return o1.operator_id - o2.operator_id
-  })
+function sort_and_make_operator_detail(operators) {
+  operators = operators.sort((o1, o2) => {
+    return o1.operator_id - o2.operator_id;
+  });
 
   const validatorOperatorIds = operators.map((operator) => BigInt(operator.operator_id));
   const validatorSharedKeys = operators.map((operator) => operator.shared_key);
   const validatorEncryptKeys = operators.map((operator) => operator.encrypt_key);
-    
+
   return {
     validatorOperatorIds,
     validatorSharedKeys,
-    validatorEncryptKeys
-  }
-
+    validatorEncryptKeys,
+  };
 }
 
 async function main() {
@@ -113,24 +112,24 @@ async function main() {
 
   // const validators = []
 
-  const pubkeys = []
-  let operatorIds = []
-  const sharesPublicKeys = []
-  const sharesEncrypteds = []
-  const deposit_datas = []
+  const pubkeys = [];
+  let operatorIds = [];
+  const sharesPublicKeys = [];
+  const sharesEncrypteds = [];
+  const deposit_datas = [];
 
-  for( const validator of result ) {
+  for (const validator of result) {
+    const { pubkey, operators, deposit_data } = validator;
 
-    const { pubkey, operators, deposit_data } = validator
-
-    const { validatorOperatorIds, validatorSharedKeys, validatorEncryptKeys } = sort_and_make_operator_detail( operators )
+    const { validatorOperatorIds, validatorSharedKeys, validatorEncryptKeys } =
+      sort_and_make_operator_detail(operators);
 
     // console.log(`----------------------------------------- ${validator.pubkey}`)
     // const validatorPublicKeys = validator.pubkey;
     // const validatorOperatorIds = validator.operators.map((operator) => BigInt(operator.operator_id));
     // const validatorSharedKeys = validator.operators.map((operator) => operator.shared_key);
     // const validatorEncryptKeys = validator.operators.map((operator) => operator.encrypt_key);
-    
+
     // console.log( `pubkeys: `,validator.pubkey )
     // console.log( `operator ids: `, validator.operators.map((operator) => BigInt(operator.operator_id)))
     // console.log( `share keys: `, validator.operators.map((operator) => operator.shared_key))
@@ -144,12 +143,12 @@ async function main() {
     // );
     // console.log( pubkey, validatorOperatorIds, validatorSharedKeys, validatorEncryptKeys, paySubscriptionFee )
 
-    pubkeys.push(pubkey)
-    operatorIds = validatorOperatorIds
-    sharesPublicKeys.push( validatorSharedKeys ) 
-    sharesEncrypteds.push( validatorEncryptKeys ) 
+    pubkeys.push(pubkey);
+    operatorIds = validatorOperatorIds;
+    sharesPublicKeys.push(validatorSharedKeys);
+    sharesEncrypteds.push(validatorEncryptKeys);
 
-    deposit_datas.push( JSON.parse(deposit_data) )
+    deposit_datas.push(JSON.parse(deposit_data));
     // validators.push({
     //   pubkey,
     //   validatorOperatorIds,
@@ -160,8 +159,7 @@ async function main() {
     // await sleep(2000);
   }
 
-
-  // console.log( 
+  // console.log(
   //     pubkeys,
   //     operatorIds,
   //     sharesPublicKeys,
@@ -169,15 +167,9 @@ async function main() {
   //     paySubscriptionFee
   //   )
 
-  await registerValidator(
-    pubkeys,
-    operatorIds,
-    sharesPublicKeys,
-    sharesEncrypteds,
-    paySubscriptionFee
-  )
+  await registerValidator(pubkeys, operatorIds, sharesPublicKeys, sharesEncrypteds, paySubscriptionFee);
 
-  console.log( JSON.stringify(deposit_datas) )
+  console.log(JSON.stringify(deposit_datas));
 
   // for (const txid of txIds) {
   //   const validator = result.find((item) => item.generate_txid === txid);

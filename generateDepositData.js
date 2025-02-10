@@ -18,9 +18,9 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console(), new winston.transports.File({ filename: "generateDepositData.log" })],
 });
 
-const clusterNodeABI = require("./clusterNodeABI.json");
-const erc20ABI = require("./erc20ABI.json");
-const networkABI = require("./networkABI.json");
+const clusterNodeABI = require("./abi/clusterNodeABI.json");
+const erc20ABI = require("./abi/erc20ABI.json");
+const networkABI = require("./abi/networkABI.json");
 
 const ethers = require("ethers");
 
@@ -119,7 +119,7 @@ async function main() {
 
   const txIds = [];
 
-  for (let i = 0; i < Math.floor(approveCount/validatorCount); i++) {
+  for (let i = 0; i < Math.floor(approveCount / validatorCount); i++) {
     // for (let i = 0; i < 1; i++) {
     const txid = await generateDepositData(
       result.cluster_pubkey,
