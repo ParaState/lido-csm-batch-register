@@ -10,8 +10,8 @@ const ethers = require("ethers");
 
 const { PRIVATE_KEY, NODE_OPERATOR_ID } = process.env;
 const nodeOperatorId = +NODE_OPERATOR_ID;
-const LidoABI = require("./LidoABI.json");
-const AccountingABI = require("./accountingABI.json");
+const LidoABI = require("./abi/LidoABI.json");
+const AccountingABI = require("./abi/accountingABI.json");
 
 const lidoAddress = "0x4562c3e63c2e586cD1651B958C22F88135aCAd4f";
 const accountingAddress = "0xc093e53e8F4b55A223c18A2Da6fA00e60DD5EFE1";

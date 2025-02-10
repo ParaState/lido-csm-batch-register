@@ -1,4 +1,4 @@
-# run node main.js
+# Run node lido-csm-batch-add-validator-key.js (MVP)
 
 1. override `deposit_data.json` to the folder
 
@@ -16,9 +16,9 @@ NODE_OPERATOR_ID=2763
 
 3. `pnpm install`
 
-4. `node main.js`
+4. `node lido-csm-batch-add-validator-key.js`
 
-# run node generateDepositData.js
+# Run node generateDepositData.js
 
 1. pnpm install
 
@@ -34,7 +34,7 @@ CLUSTER_NODE_URL=http://127.0.0.1:7777
 
 4. and you will get json file like `generateDepositData-1737859348838.json`
 
-# run node registerValidator.js
+# Run node registerValidator.js
 
 1. pnpm install
 
