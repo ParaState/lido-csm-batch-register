@@ -38,8 +38,8 @@ const wallet = new ethers.Wallet(GENERATE_PRIVATE_KEY, provider);
 
 console.log("🚀 ~ wallet:", wallet.address);
 
-const approveCount = 100;
-const validatorCount = 1;
+const approveCount = 5;
+const validatorCount = 5;
 const minFee = 59400000000000000n;
 const paySubscriptionFee = minFee * 10n;
 
@@ -69,11 +69,12 @@ async function registerValidator(
   const networkContract = new ethers.Contract(networkAddress, networkABI, signer);
   const tx = await networkContract
     .connect(signer)
-    .registerValidator(
+    .batchRegisterValidator(
       validatorPublicKeys,
       validatorOperatorIds,
       validatorSharedKeys,
       validatorEncryptKeys,
+      validatorPublicKeys.length,
       paySubscriptionFee
     );
 
@@ -81,8 +82,25 @@ async function registerValidator(
   await tx.wait(2); // Wait for 2 block confirmations
 }
 
+function sort_and_make_operator_detail( operators ) {
+  operators = operators.sort( ( o1, o2 ) => {
+    return o1.operator_id - o2.operator_id
+  })
+
+  const validatorOperatorIds = operators.map((operator) => BigInt(operator.operator_id));
+  const validatorSharedKeys = operators.map((operator) => operator.shared_key);
+  const validatorEncryptKeys = operators.map((operator) => operator.encrypt_key);
+    
+  return {
+    validatorOperatorIds,
+    validatorSharedKeys,
+    validatorEncryptKeys
+  }
+
+}
+
 async function main() {
-  const filename = "generateDepositData-1737861329943.json";
+  const filename = "generateDepositData-1737947094619.json";
   const txIds = JSON.parse(fs.readFileSync(filename, "utf8"));
 
   logger.info(`txIds.length: ${txIds.length}`);
@@ -93,31 +111,102 @@ async function main() {
 
   logger.info("queryValidatorStatus");
 
-  for (const txid of txIds) {
-    const validator = result.find((item) => item.generate_txid === txid);
-    // console.log("🚀 ~ main ~ validator:", validator);
+  // const validators = []
 
-    const validatorPublicKeys = validator.pubkey;
-    const validatorOperatorIds = validator.operators.map((operator) => BigInt(operator.operator_id));
-    const validatorSharedKeys = validator.operators.map((operator) => operator.shared_key);
-    const validatorEncryptKeys = validator.operators.map((operator) => operator.encrypt_key);
+  const pubkeys = []
+  let operatorIds = []
+  const sharesPublicKeys = []
+  const sharesEncrypteds = []
+  const deposit_datas = []
 
-    logger.info(`registerValidator ${txid}`);
-    logger.info(`validatorPublicKeys: ${validatorPublicKeys}`);
-    logger.info(`validatorOperatorIds: ${validatorOperatorIds}`);
-    logger.info(`validatorSharedKeys: ${validatorSharedKeys}`);
-    logger.info(`validatorEncryptKeys: ${validatorEncryptKeys}`);
+  for( const validator of result ) {
 
-    await registerValidator(
-      validatorPublicKeys,
-      validatorOperatorIds,
-      validatorSharedKeys,
-      validatorEncryptKeys,
-      paySubscriptionFee
-    );
+    const { pubkey, operators, deposit_data } = validator
 
-    logger.info(`registerValidator ${txid} end`);
+    const { validatorOperatorIds, validatorSharedKeys, validatorEncryptKeys } = sort_and_make_operator_detail( operators )
+
+    // console.log(`----------------------------------------- ${validator.pubkey}`)
+    // const validatorPublicKeys = validator.pubkey;
+    // const validatorOperatorIds = validator.operators.map((operator) => BigInt(operator.operator_id));
+    // const validatorSharedKeys = validator.operators.map((operator) => operator.shared_key);
+    // const validatorEncryptKeys = validator.operators.map((operator) => operator.encrypt_key);
+    
+    // console.log( `pubkeys: `,validator.pubkey )
+    // console.log( `operator ids: `, validator.operators.map((operator) => BigInt(operator.operator_id)))
+    // console.log( `share keys: `, validator.operators.map((operator) => operator.shared_key))
+
+    // await registerValidator(
+    //   validatorPublicKeys,
+    //   validatorOperatorIds,
+    //   validatorSharedKeys,
+    //   validatorEncryptKeys,
+    //   paySubscriptionFee
+    // );
+    // console.log( pubkey, validatorOperatorIds, validatorSharedKeys, validatorEncryptKeys, paySubscriptionFee )
+
+    pubkeys.push(pubkey)
+    operatorIds = validatorOperatorIds
+    sharesPublicKeys.push( validatorSharedKeys ) 
+    sharesEncrypteds.push( validatorEncryptKeys ) 
+
+    deposit_datas.push( JSON.parse(deposit_data) )
+    // validators.push({
+    //   pubkey,
+    //   validatorOperatorIds,
+    //   validatorSharedKeys,
+    //   validatorEncryptKeys,
+    // })
+    // console.log(`-----------------------------------------`)
+    // await sleep(2000);
   }
+
+
+  // console.log( 
+  //     pubkeys,
+  //     operatorIds,
+  //     sharesPublicKeys,
+  //     sharesEncrypteds,
+  //     paySubscriptionFee
+  //   )
+
+  await registerValidator(
+    pubkeys,
+    operatorIds,
+    sharesPublicKeys,
+    sharesEncrypteds,
+    paySubscriptionFee
+  )
+
+  console.log( JSON.stringify(deposit_datas) )
+
+  // for (const txid of txIds) {
+  //   const validator = result.find((item) => item.generate_txid === txid);
+  //   // console.log("🚀 ~ main ~ validator:", validator);
+
+  //   const validatorPublicKeys = validator.pubkey;
+  //   const validatorOperatorIds = validator.operators.map((operator) => BigInt(operator.operator_id));
+  //   const validatorSharedKeys = validator.operators.map((operator) => operator.shared_key);
+  //   const validatorEncryptKeys = validator.operators.map((operator) => operator.encrypt_key);
+  //   // logger.info(`registerValidator ${txid}`);
+  //   // logger.info(`validatorPublicKeys: ${validatorPublicKeys}`);
+  //   // logger.info(`validatorOperatorIds: ${validatorOperatorIds}`);
+  //   // logger.info(`validatorSharedKeys: ${validatorSharedKeys}`);
+  //   // logger.info(`validatorEncryptKeys: ${validatorEncryptKeys}`);
+
+  //   console.log( `pubkeys: `,validatorPublicKeys )
+  //   console.log( `operator ids: `, validatorOperatorIds)
+  //   console.log( `share keys: `, validatorSharedKeys)
+
+  //   // await registerValidator(
+  //   //   validatorPublicKeys,
+  //   //   validatorOperatorIds,
+  //   //   validatorSharedKeys,
+  //   //   validatorEncryptKeys,
+  //   //   paySubscriptionFee
+  //   // );
+
+  //   logger.info(`registerValidator ${txid} end`);
+  // }
 
   console.log("success");
 }

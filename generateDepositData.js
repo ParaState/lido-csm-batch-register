@@ -41,8 +41,8 @@ const wallet = new ethers.Wallet(GENERATE_PRIVATE_KEY, provider);
 
 console.log("🚀 ~ wallet:", wallet.address);
 
-const approveCount = 100;
-const validatorCount = 1;
+const approveCount = 5;
+const validatorCount = 5;
 const paySubscriptionFee = 59400000000000000n;
 
 async function getActionFee(actionType) {
@@ -119,14 +119,15 @@ async function main() {
 
   const txIds = [];
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < Math.floor(approveCount/validatorCount); i++) {
     // for (let i = 0; i < 1; i++) {
     const txid = await generateDepositData(
       result.cluster_pubkey,
       validatorCount,
       [12, 14, 15, 16],
       ethers.parseEther("32"),
-      wallet.address
+      // wallet.address
+      "0xF0179dEC45a37423EAD4FaD5fCb136197872EAd9"
     );
     txIds.push(txid);
   }
