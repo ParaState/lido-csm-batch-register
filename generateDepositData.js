@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { GENERATE_PRIVATE_KEY, CLUSTER_NODE_URL } = process.env;
+const { GENERATE_PRIVATE_KEY, CLUSTER_NODE_URL, PROVIDER_URL } = process.env;
 
 const winston = require("winston");
 const axios = require("axios");
@@ -33,7 +33,7 @@ const clusterNodeAddress = "0xf0455Aca6B61109098562610e89C7ca22c12Bb43";
 const erc20Address = "0x95AC0C8Bba72Be4296195C985F85Df98fD1ef84a";
 
 // // generate holesky rpc and call function
-const provider = new ethers.JsonRpcProvider("https://ethereum-holesky-rpc.publicnode.com");
+const provider = new ethers.JsonRpcProvider(PROVIDER_URL);
 
 const clusterNodeContract = new ethers.Contract(clusterNodeAddress, clusterNodeABI, provider);
 

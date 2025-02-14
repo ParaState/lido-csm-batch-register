@@ -2,8 +2,12 @@ const ethers = require("ethers");
 
 const LidoABI = require("../abi/LidoABI.json");
 
+require("dotenv").config();
+
+const { PROVIDER_URL } = process.env;
+
 // 1. Provider Setup
-const provider = new ethers.JsonRpcProvider("https://ethereum-holesky-rpc.publicnode.com");
+const provider = new ethers.JsonRpcProvider(PROVIDER_URL);
 
 const nodeOperatorAddedEventABI = LidoABI.filter((abi) => abi.type === "event" && abi.name === "NodeOperatorAdded");
 
