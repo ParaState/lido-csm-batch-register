@@ -29,10 +29,10 @@ function parseEventsFromReceipt(transactionReceipt) {
   if (transactionReceipt && transactionReceipt.logs) {
     transactionReceipt.logs.forEach((log) => {
       try {
-        // 使用 NodeOperatorAdded 事件的接口尝试解析日志
+        // Try to parse the log using the NodeOperatorAdded event interface
         const parsedLog = nodeOperatorAddedInterface.parseLog(log);
 
-        // 检查解析后的事件名称是否为 "NodeOperatorAdded"
+        // Check if the parsed event name is "NodeOperatorAdded"
         if (parsedLog && parsedLog.name === "NodeOperatorAdded") {
           console.log("find NodeOperatorAdded event:");
           console.log("event name:", parsedLog.name);
@@ -40,7 +40,7 @@ function parseEventsFromReceipt(transactionReceipt) {
 
           // extract nodeOperatorId
           const nodeOperatorId = parsedLog.args.nodeOperatorId;
-          console.log("node operator id:", nodeOperatorId.toString()); // 转换为字符串显示
+          console.log("node operator id:", nodeOperatorId.toString()); // Convert to string for display
 
           // you can handle nodeOperatorId here, for example, store it to a variable or perform other operations
         } else {
@@ -50,7 +50,7 @@ function parseEventsFromReceipt(transactionReceipt) {
           }
         }
       } catch (error) {
-        // if the parsing fails, it may be because the log does not match the NodeOperatorAdded event ABI, ignore it
+        // If parsing fails, it may be because the log doesn't match the NodeOperatorAdded event ABI, ignore it
         console.error("parse log error:", error);
       }
     });
