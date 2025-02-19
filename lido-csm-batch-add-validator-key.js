@@ -57,7 +57,7 @@ async function getRequiredBondForNextKeys(length) {
 async function main() {
   // const needAmount = await getRequiredBondForNextKeys(10);
 
-  const batchSize = 10;
+  const batchSize = 25;
   for (let i = 0; i < depositData.length; i += batchSize) {
     const depositDataChunk = depositData.slice(i, i + batchSize);
 
